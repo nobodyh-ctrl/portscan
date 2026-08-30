@@ -90,7 +90,9 @@ pip install -e .
 
 ### Linux / macOS
 
-En distribuciones recientes de Ubuntu/Debian, `pip` puede rechazar instalar paquetes directamente sobre el Python del sistema (protección **PEP 668**, "externally managed environment"). Se recomienda usar un entorno virtual:
+En distribuciones recientes de Ubuntu/Debian, `pip` puede rechazar instalar paquetes directamente sobre el Python del sistema (protección **PEP 668**, "externally managed environment"). Hay dos formas válidas de instalar, según qué necesites:
+
+**Opción A — `venv` (entorno aislado, solo activo cuando lo activás):**
 
 ```bash
 python3 -m venv venv
@@ -98,14 +100,16 @@ source venv/bin/activate
 pip install -e .
 ```
 
-Con el entorno virtual **activado**, el comando `portscan` queda disponible en esa sesión de terminal.
+Con esto, el comando `portscan` **solo funciona mientras ese entorno virtual esté activado** en la terminal (`source venv/bin/activate`). Si abrís una terminal nueva o no lo activás, `portscan` no se va a encontrar — no es un error, es cómo funcionan los entornos virtuales por diseño (aíslan dependencias por proyecto).
 
-Alternativa, para instalarlo como comando disponible en todo el sistema (sin tener que activar un entorno virtual cada vez), usando [`pipx`](https://pypa.github.io/pipx/):
+**Opción B — `pipx` (comando disponible siempre, sin activar nada) — recomendada si querés usarlo como herramienta de sistema, tipo `nmap`:**
 
 ```bash
 sudo apt install pipx   # si no lo tenés instalado
 pipx install .
 ```
+
+`pipx` instala el paquete en un entorno aislado igual que `venv`, pero además deja el comando (`portscan`) enlazado en una carpeta que sí queda en tu `PATH` (normalmente `~/.local/bin`), así que funciona en cualquier terminal nueva sin pasos extra.
 
 ## 🚀 Uso
 
@@ -173,6 +177,14 @@ PC (Windows) ──── LAN ──── VM Ubuntu Server (VirtualBox, adaptad
 - El puerto **FILTERED** se probó bloqueando tráfico en silencio con `ufw deny` (política de firewall tipo DROP).
 
 Este entorno es reproducible con cualquier hipervisor (VirtualBox, VMware) y una VM Linux liviana.
+
+## 🔧 Troubleshooting: firewalls "en capas" (Windows)
+
+En Windows, agregar una regla de entrada en el Firewall de Windows (`New-NetFirewallRule ... -Action Allow`) **no garantiza** que el puerto pase a OPEN. Muchos antivirus/suites de seguridad (Avast, Norton, McAfee, etc.) traen su **propio módulo de firewall**, que filtra el tráfico de forma independiente y adicional al Firewall de Windows — si ese módulo bloquea el puerto, va a seguir dando **FILTERED** aunque la regla de Windows Firewall esté perfectamente configurada (`Enabled: True`, `Action: Allow`).
+
+Ejemplo real detectado durante el desarrollo de este proyecto: al intentar exponer un servidor MySQL local en el puerto 3306 para escanearlo desde otra máquina de la LAN, la regla de Windows Firewall no alcanzó — **Avast Antivirus** seguía bloqueando el tráfico entrante en su propio firewall, hasta agregar la excepción correspondiente también ahí.
+
+**Si agregaste una regla de firewall y el puerto sigue en FILTERED:** revisá si tenés un antivirus con firewall propio instalado, y agregá la excepción ahí también.
 
 ## ⚠️ Limitaciones (v1)
 
