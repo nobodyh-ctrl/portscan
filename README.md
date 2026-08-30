@@ -178,13 +178,30 @@ PC (Windows) ──── LAN ──── VM Ubuntu Server (VirtualBox, adaptad
 
 Este entorno es reproducible con cualquier hipervisor (VirtualBox, VMware) y una VM Linux liviana.
 
-## 🔧 Troubleshooting: firewalls "en capas" (Windows)
+## 🔧 Troubleshooting
+
+### Firewalls "en capas" (Windows)
 
 En Windows, agregar una regla de entrada en el Firewall de Windows (`New-NetFirewallRule ... -Action Allow`) **no garantiza** que el puerto pase a OPEN. Muchos antivirus/suites de seguridad (Avast, Norton, McAfee, etc.) traen su **propio módulo de firewall**, que filtra el tráfico de forma independiente y adicional al Firewall de Windows — si ese módulo bloquea el puerto, va a seguir dando **FILTERED** aunque la regla de Windows Firewall esté perfectamente configurada (`Enabled: True`, `Action: Allow`).
 
 Ejemplo real detectado durante el desarrollo de este proyecto: al intentar exponer un servidor MySQL local en el puerto 3306 para escanearlo desde otra máquina de la LAN, la regla de Windows Firewall no alcanzó — **Avast Antivirus** seguía bloqueando el tráfico entrante en su propio firewall, hasta agregar la excepción correspondiente también ahí.
 
 **Si agregaste una regla de firewall y el puerto sigue en FILTERED:** revisá si tenés un antivirus con firewall propio instalado, y agregá la excepción ahí también.
+
+### `ImportError: cannot import name 'main' from 'portscan.cli'` al instalar con `pipx`
+
+En algunos entornos (detectado con `pipx` 1.8.0 sobre Python 3.14), `pipx install .` puede terminar instalando un `cli.py` **vacío** dentro de su entorno interno, aunque el comando reporte que la instalación fue exitosa. Es un bug de cómo `pipx` arma el paquete al construirlo directamente desde una carpeta fuente — no afecta al código en sí ni a una instalación con `pip`/`venv` normal.
+
+**Solución:** construir el `wheel` (el paquete ya empaquetado) vos mismo con `build`, e instalar ese archivo en vez de la carpeta fuente:
+
+```bash
+python3 -m venv build-venv
+build-venv/bin/pip install build
+build-venv/bin/python -m build
+pipx uninstall portscan   # si había quedado una instalación rota
+pipx install dist/*.whl
+rm -rf build-venv
+```
 
 ## ⚠️ Limitaciones (v1)
 
