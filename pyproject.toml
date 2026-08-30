@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "portscan"
+version = "0.1.0"
+description = "Network scanner TCP básico, hecho para aprender fundamentos de networking y ciberseguridad."
+requires-python = ">=3.8"
+dependencies = [
+    "pyfiglet>=1.0.0",
+]
+
+[project.scripts]
+portscan = "portscan.cli:main"
+
+[tool.setuptools]
+packages = ["portscan"]
