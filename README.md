@@ -1,6 +1,9 @@
 
-# 🔍 PortScan — Escáner de Puertos TCP
 <div align="center">
+
+![PortScan banner](assets/PortScan.png)
+
+# 🔍 PortScan — Escáner de Puertos TCP
 
 [![Python](https://img.shields.io/badge/PYTHON-green?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![TCP/IP](https://img.shields.io/badge/TCP%2FIP-blue?style=for-the-badge&logoColor=white)](https://en.wikipedia.org/wiki/Internet_protocol_suite)
