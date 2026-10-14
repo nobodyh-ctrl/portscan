@@ -3,7 +3,7 @@ import argparse
 from portscan.scanner import scan_range
 from portscan.display import print_header, print_result, print_summary
 from portscan.banner import print_banner
-from portscan.report import save_results
+from portscan.report import save_results, save_results_pdf
 
 
 def main():
@@ -23,8 +23,10 @@ def main():
 
     print_summary(results)
 
-    filename = save_results(args.target, args.start, args.end, results)
-    print(f"\nResultados guardados en: {filename}")
+    txt_filename = save_results(args.target, args.start, args.end, results)
+    pdf_filename = save_results_pdf(args.target, args.start, args.end, results)
+    print(f"\nResultados guardados en: {txt_filename}")
+    print(f"Resultados guardados en: {pdf_filename}")
 
 
 if __name__ == "__main__":
